@@ -10,7 +10,7 @@
     <name>plug-test</name>
     <description>mafia.club plug test thing</description>
     <keywords>cordova,android,plug_test</keywords>
-    <repo>https://gitlab.webiech.ru/shubckin/plug-test.git</repo>
+    <repo>https://github.com/shubckin/plug-test.git</repo>
 
     <license>BSD</license>
 

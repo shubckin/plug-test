@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.webiech.ru/shubckin/plug-test.git"
+    "url": "git+https://github.com/shubckin/plug-test.git"
   },
   "keywords": [
     "cordova",
