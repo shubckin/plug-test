@@ -19,6 +19,8 @@ import android.os.Handler;
 
 public class PlugTest extends CordovaPlugin
 {
+
+    public static final String ACTION_TEST_SOMETHING = "testSomething";
     public static final String ACTION_IS_SUPPORTED = "isSupported";
     public static final String ACTION_IS_IMMERSIVE_MODE_SUPPORTED = "isImmersiveModeSupported";
     public static final String ACTION_IMMERSIVE_WIDTH = "immersiveWidth";
@@ -96,8 +98,30 @@ public class PlugTest extends CordovaPlugin
             return immersiveMode();
         else if (ACTION_SET_SYSTEM_UI_VISIBILITY.equals(action))
             return setSystemUiVisibility(args.getInt(0));
+        else if (ACTION_TEST_SOMETHING.equals(action))
+            return testSomething(args.getString(0));
 
         return false;
+    }
+
+    protected boolean testSomething(String str)
+    {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                while(true) {
+                    context.success(str);
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+
+        return true;
     }
 
     protected void resetWindow()
