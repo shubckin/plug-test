@@ -3,16 +3,17 @@ package club.mafia.plug_test;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
-import android.content.Context;
-import android.content.Intent;
 
 public class PlugTest extends CordovaPlugin {
 
@@ -35,7 +36,9 @@ public class PlugTest extends CordovaPlugin {
     private int mLastSystemUIVisibility = 0;
     private final Handler mLeanBackHandler = new Handler();
 
+    //my methods:
     private CallbackContext callbackContext;
+    Activity mainActivity;
 
     private final Runnable mEnterLeanback = new Runnable() {
         @Override
@@ -122,26 +125,34 @@ public class PlugTest extends CordovaPlugin {
 //                useCallback(str);
 //                useCallbackError("my error");
 
-                Class mainActivity;
-                Context context = cordova.getActivity().getApplicationContext();//getApplicationContext();
-                String packageName = context.getPackageName();
-                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-                String className = launchIntent.getComponent().getClassName();
 
-                try {
-                    //loading the Main Activity to not import it in the plugin
-                    mainActivity = Class.forName(className);
-                    useCallback(mainActivity.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    useCallbackError(e.toString());
-                }
             }
         });
 
 
         return true;
     }
+
+    protected void storeMainActivity() {
+        this.mainActivity = cordova.getActivity();
+        useCallback(this.mainActivity.toString());
+//        Class mainActivity;
+//        Context context = cordova.getActivity().getApplicationContext();//getApplicationContext();
+//        String packageName = context.getPackageName();
+//        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+//        String className = launchIntent.getComponent().getClassName();
+//
+//        try {
+//            //loading the Main Activity to not import it in the plugin
+//            mainActivity = Class.forName(className);
+//            useCallback(mainActivity.toString());
+//            this.mainActivity = mainActivity;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            useCallbackError(e.toString());
+//        }
+    }
+
 
     protected void resetWindow() {
         decorView.setOnFocusChangeListener(null);
@@ -479,4 +490,56 @@ public class PlugTest extends CordovaPlugin {
         }
     }
 
+    class AndroidBug5497Workaround {
+
+        // For more information, see https://code.google.com/p/android/issues/detail?id=5497
+        // To use this class, simply invoke assistActivity() on an Activity that already has its content view set.
+
+//        public static void assistActivity (Activity activity) {
+//            new AndroidBug5497Workaround(activity);
+//        }
+
+        private View mChildOfContent;
+        private int usableHeightPrevious;
+        private FrameLayout.LayoutParams frameLayoutParams;
+
+        private AndroidBug5497Workaround(Activity activity) {
+            FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
+            mChildOfContent = content.getChildAt(0);
+            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                public void onGlobalLayout() {
+                    possiblyResizeChildOfContent();
+                }
+            });
+            frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+        }
+
+        private void possiblyResizeChildOfContent() {
+            int usableHeightNow = computeUsableHeight();
+            if (usableHeightNow != usableHeightPrevious) {
+                int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
+                int heightDifference = usableHeightSansKeyboard - usableHeightNow;
+                if (heightDifference > (usableHeightSansKeyboard / 4)) {
+                    // keyboard probably just became visible
+                    //frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
+                    useCallback(usableHeightSansKeyboard + "");
+                } else {
+                    // keyboard probably just became hidden
+                    //frameLayoutParams.height = usableHeightSansKeyboard;
+                    useCallback(usableHeightSansKeyboard + "");
+                }
+                //mChildOfContent.requestLayout();
+                usableHeightPrevious = usableHeightNow;
+            }
+        }
+
+        private int computeUsableHeight() {
+            Rect r = new Rect();
+            mChildOfContent.getWindowVisibleDisplayFrame(r);
+            return (r.bottom - r.top);
+        }
+    }
+
 }
+
+
