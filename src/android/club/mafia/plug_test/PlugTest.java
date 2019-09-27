@@ -1,24 +1,18 @@
 package club.mafia.plug_test;
 
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
-import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaWebView;
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.graphics.Color;
-import android.os.Handler;
+import org.apache.cordova.*;
+import org.json.JSONArray;
+import org.json.JSONException;
 
-public class PlugTest extends CordovaPlugin
-{
+public class PlugTest extends CordovaPlugin {
 
     public static final String ACTION_TEST_SOMETHING = "testSomething";
     public static final String ACTION_IS_SUPPORTED = "isSupported";
@@ -38,6 +32,9 @@ public class PlugTest extends CordovaPlugin
     private View decorView;
     private int mLastSystemUIVisibility = 0;
     private final Handler mLeanBackHandler = new Handler();
+
+    private CallbackContext callbackContext;
+
     private final Runnable mEnterLeanback = new Runnable() {
         @Override
         public void run() {
@@ -71,8 +68,7 @@ public class PlugTest extends CordovaPlugin
     }
 
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException
-    {
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         context = callbackContext;
         activity = cordova.getActivity();
         window = activity.getWindow();
@@ -98,29 +94,25 @@ public class PlugTest extends CordovaPlugin
             return immersiveMode();
         else if (ACTION_SET_SYSTEM_UI_VISIBILITY.equals(action))
             return setSystemUiVisibility(args.getInt(0));
-        else if (ACTION_TEST_SOMETHING.equals(action))
+        else if (ACTION_TEST_SOMETHING.equals(action)) {
+            this.callbackContext = callbackContext;
             return testSomething(args.getString(0));
+        }
 
         return false;
     }
 
-    protected boolean testSomething(String str)
-    {
+    protected void useCallback(String answer) {
+        PluginResult resultA = new PluginResult(PluginResult.Status.OK, answer);
+        resultA.setKeepCallback(true);
+        callbackContext.sendPluginResult(resultA);
+    }
+
+    protected boolean testSomething(String str) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
-                while(true) {
-
-                    PluginResult resultA = new PluginResult(PluginResult.Status.OK, str);
-                    resultA.setKeepCallback(true);
-                    context.sendPluginResult(resultA);
-
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                }
+                useCallback(str);
+                useCallback(str);
             }
         });
 
@@ -128,8 +120,7 @@ public class PlugTest extends CordovaPlugin
         return true;
     }
 
-    protected void resetWindow()
-    {
+    protected void resetWindow() {
         decorView.setOnFocusChangeListener(null);
         decorView.setOnSystemUiVisibilityChangeListener(null);
 
@@ -139,8 +130,7 @@ public class PlugTest extends CordovaPlugin
     /**
      * Are any of the features of this plugin supported?
      */
-    protected boolean isSupported()
-    {
+    protected boolean isSupported() {
         boolean supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 
         PluginResult res = new PluginResult(PluginResult.Status.OK, supported);
@@ -151,8 +141,7 @@ public class PlugTest extends CordovaPlugin
     /**
      * Is immersive mode supported?
      */
-    protected boolean isImmersiveModeSupported()
-    {
+    protected boolean isImmersiveModeSupported() {
         boolean supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         PluginResult res = new PluginResult(PluginResult.Status.OK, supported);
@@ -163,24 +152,18 @@ public class PlugTest extends CordovaPlugin
     /**
      * The width of the screen in immersive mode
      */
-    protected boolean immersiveWidth()
-    {
-        activity.runOnUiThread(new Runnable()
-        {
+    protected boolean immersiveWidth() {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     Point outSize = new Point();
 
                     decorView.getDisplay().getRealSize(outSize);
 
                     PluginResult res = new PluginResult(PluginResult.Status.OK, outSize.x);
                     context.sendPluginResult(res);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -192,24 +175,18 @@ public class PlugTest extends CordovaPlugin
     /**
      * The height of the screen in immersive mode
      */
-    protected boolean immersiveHeight()
-    {
-        activity.runOnUiThread(new Runnable()
-        {
+    protected boolean immersiveHeight() {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     Point outSize = new Point();
 
                     decorView.getDisplay().getRealSize(outSize);
 
                     PluginResult res = new PluginResult(PluginResult.Status.OK, outSize.y);
                     context.sendPluginResult(res);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -221,21 +198,16 @@ public class PlugTest extends CordovaPlugin
     /**
      * Hide system UI until user interacts
      */
-    protected boolean leanMode()
-    {
-        if (!isSupported())
-        {
+    protected boolean leanMode() {
+        if (!isSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
 
                     int uiOptions =
@@ -246,12 +218,10 @@ public class PlugTest extends CordovaPlugin
                                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 
                     mLastSystemUIVisibility = uiOptions;
-                    decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
-                    {
+                    decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
                         @Override
-                        public void onSystemUiVisibilityChange(int visibility)
-                        {
-                            if((mLastSystemUIVisibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
+                        public void onSystemUiVisibilityChange(int visibility) {
+                            if ((mLastSystemUIVisibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
                                     && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
                                 resetHideTimer();
                             }
@@ -262,9 +232,7 @@ public class PlugTest extends CordovaPlugin
                     decorView.setSystemUiVisibility(uiOptions);
 
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -283,21 +251,16 @@ public class PlugTest extends CordovaPlugin
     /**
      * Show system UI
      */
-    protected boolean showSystemUI()
-    {
-        if (!isSupported())
-        {
+    protected boolean showSystemUI() {
+        if (!isSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
 
                     // Remove translucent theme from bars
@@ -318,9 +281,7 @@ public class PlugTest extends CordovaPlugin
                     context.sendPluginResult(res);
 
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -332,21 +293,16 @@ public class PlugTest extends CordovaPlugin
     /**
      * Extend your app underneath the status bar (Android 4.4+ only)
      */
-    protected boolean showUnderStatusBar()
-    {
-        if (!isImmersiveModeSupported())
-        {
+    protected boolean showUnderStatusBar() {
+        if (!isImmersiveModeSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
 
                     // Make the status bar translucent
@@ -362,9 +318,7 @@ public class PlugTest extends CordovaPlugin
                     decorView.setSystemUiVisibility(uiOptions);
 
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -376,21 +330,16 @@ public class PlugTest extends CordovaPlugin
     /**
      * Extend your app underneath the system UI (Android 4.4+ only)
      */
-    protected boolean showUnderSystemUI()
-    {
-        if (!isImmersiveModeSupported())
-        {
+    protected boolean showUnderSystemUI() {
+        if (!isImmersiveModeSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
 
                     // Make the status and nav bars translucent
@@ -407,9 +356,7 @@ public class PlugTest extends CordovaPlugin
                     decorView.setSystemUiVisibility(uiOptions);
 
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -421,21 +368,16 @@ public class PlugTest extends CordovaPlugin
     /**
      * Hide system UI and switch to immersive mode (Android 4.4+ only)
      */
-    protected boolean immersiveMode()
-    {
-        if (!isImmersiveModeSupported())
-        {
+    protected boolean immersiveMode() {
+        if (!isImmersiveModeSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
 
                     final int uiOptions =
@@ -449,31 +391,24 @@ public class PlugTest extends CordovaPlugin
                     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     decorView.setSystemUiVisibility(uiOptions);
 
-                    decorView.setOnFocusChangeListener(new View.OnFocusChangeListener()
-                    {
+                    decorView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                         @Override
-                        public void onFocusChange(View v, boolean hasFocus)
-                        {
-                            if (hasFocus)
-                            {
+                        public void onFocusChange(View v, boolean hasFocus) {
+                            if (hasFocus) {
                                 decorView.setSystemUiVisibility(uiOptions);
                             }
                         }
                     });
 
-                    decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
-                    {
+                    decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
                         @Override
-                        public void onSystemUiVisibilityChange(int visibility)
-                        {
+                        public void onSystemUiVisibilityChange(int visibility) {
                             decorView.setSystemUiVisibility(uiOptions);
                         }
                     });
 
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
@@ -482,27 +417,20 @@ public class PlugTest extends CordovaPlugin
         return true;
     }
 
-    protected boolean setSystemUiVisibility(final int visibility)
-    {
-        if (!isSupported())
-        {
+    protected boolean setSystemUiVisibility(final int visibility) {
+        if (!isSupported()) {
             context.error("Not supported");
             return false;
         }
 
-        activity.runOnUiThread(new Runnable()
-        {
+        activity.runOnUiThread(new Runnable() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     resetWindow();
                     decorView.setSystemUiVisibility(visibility);
                     context.success();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     context.error(e.getMessage());
                 }
             }
