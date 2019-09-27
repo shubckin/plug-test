@@ -110,6 +110,7 @@ public class PlugTest extends CordovaPlugin
             public void run() {
                 while(true) {
                     context.success(str);
+                    context.success(str);
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
