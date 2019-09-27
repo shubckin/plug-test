@@ -38,7 +38,7 @@ public class PlugTest extends CordovaPlugin {
 
     //my methods:
     private CallbackContext callbackContext;
-    Activity mainActivity;
+    private AndroidBug5497Workaround keyBoardSpy=null;
 
     private final Runnable mEnterLeanback = new Runnable() {
         @Override
@@ -122,9 +122,14 @@ public class PlugTest extends CordovaPlugin {
     protected boolean testSomething(String str) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
-//                useCallback(str);
-//                useCallbackError("my error");
-                storeMainActivity();
+
+                try {
+                    if (keyBoardSpy == null) {
+                        keyBoardSpy = new AndroidBug5497Workaround(cordova.getActivity());
+                    }
+                } catch (Exception e) {
+                    useCallbackError(e.toString());
+                }
 
             }
         });
@@ -132,27 +137,6 @@ public class PlugTest extends CordovaPlugin {
 
         return true;
     }
-
-    protected void storeMainActivity() {
-        this.mainActivity = cordova.getActivity();
-        useCallback(this.mainActivity.toString());
-//        Class mainActivity;
-//        Context context = cordova.getActivity().getApplicationContext();//getApplicationContext();
-//        String packageName = context.getPackageName();
-//        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-//        String className = launchIntent.getComponent().getClassName();
-//
-//        try {
-//            //loading the Main Activity to not import it in the plugin
-//            mainActivity = Class.forName(className);
-//            useCallback(mainActivity.toString());
-//            this.mainActivity = mainActivity;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            useCallbackError(e.toString());
-//        }
-    }
-
 
     protected void resetWindow() {
         decorView.setOnFocusChangeListener(null);
@@ -538,6 +522,8 @@ public class PlugTest extends CordovaPlugin {
             mChildOfContent.getWindowVisibleDisplayFrame(r);
             return (r.bottom - r.top);
         }
+
+
     }
 
 }
