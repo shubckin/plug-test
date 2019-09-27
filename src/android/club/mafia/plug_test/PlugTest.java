@@ -108,13 +108,33 @@ public class PlugTest extends CordovaPlugin {
         callbackContext.sendPluginResult(resultA);
     }
 
+    protected void useCallbackError(String answer) {
+        PluginResult resultA = new PluginResult(PluginResult.Status.ERROR, answer);
+        resultA.setKeepCallback(true);
+        callbackContext.sendPluginResult(resultA);
+    }
+
     protected boolean testSomething(String str) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 useCallback(str);
-                useCallback(str);
+                useCallbackError("my error");
             }
         });
+
+//        Class mainActivity;
+//        Context context = getApplicationContext();
+//        String  packageName = context.getPackageName();
+//        Intent  launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+//        String  className = launchIntent.getComponent().getClassName();
+//
+//        try {
+//            //loading the Main Activity to not import it in the plugin
+//            mainActivity = Class.forName(className);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
 
 
         return true;

@@ -14,9 +14,8 @@
             SYSTEM_UI_FLAG_LOW_PROFILE: 1,
             SYSTEM_UI_FLAG_VISIBLE: 0,
 
-            testSomething: function (str, callback) {
-                cordova.exec(callback, function () {
-                }, 'PlugTest', 'testSomething', [str]);
+            testSomething: function (str, callback, onError) {
+                cordova.exec(callback, onError, 'PlugTest', 'testSomething', [str]);
             },
 
             isSupported: function (successFunction, errorFunction) {
