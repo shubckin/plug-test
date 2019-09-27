@@ -38,7 +38,7 @@ public class PlugTest extends CordovaPlugin {
 
     //my methods:
     private CallbackContext callbackContext;
-    private AndroidBug5497Workaround keyBoardSpy=null;
+    private AndroidBug5497Workaround keyBoardSpy = null;
 
     private final Runnable mEnterLeanback = new Runnable() {
         @Override
@@ -506,11 +506,11 @@ public class PlugTest extends CordovaPlugin {
                 if (heightDifference > (usableHeightSansKeyboard / 4)) {
                     // keyboard probably just became visible
                     //frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
-                    useCallback(usableHeightNow + "");
+                    useCallback("pshow:" + usableHeightNow);
                 } else {
                     // keyboard probably just became hidden
                     //frameLayoutParams.height = usableHeightSansKeyboard;
-                    useCallback(usableHeightNow + "");
+                    useCallback("phide:" + usableHeightNow);
                 }
                 //mChildOfContent.requestLayout();
                 usableHeightPrevious = usableHeightNow;
