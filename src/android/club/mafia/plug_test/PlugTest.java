@@ -124,7 +124,7 @@ public class PlugTest extends CordovaPlugin {
             public void run() {
 //                useCallback(str);
 //                useCallbackError("my error");
-
+                storeMainActivity();
 
             }
         });
