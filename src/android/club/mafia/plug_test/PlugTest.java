@@ -109,8 +109,11 @@ public class PlugTest extends CordovaPlugin
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 while(true) {
-                    context.success(str);
-                    context.success(str);
+
+                    PluginResult resultA = new PluginResult(PluginResult.Status.OK, str);
+                    resultA.setKeepCallback(true);
+                    context.sendPluginResult(resultA);
+
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
