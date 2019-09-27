@@ -11,6 +11,8 @@ import android.view.WindowManager;
 import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
+import android.content.Context;
+import android.content.Intent;
 
 public class PlugTest extends CordovaPlugin {
 
@@ -121,7 +123,7 @@ public class PlugTest extends CordovaPlugin {
 //                useCallbackError("my error");
 
                 Class mainActivity;
-                Context context = getApplicationContext();
+                Context context = cordova.getActivity().getApplicationContext();//getApplicationContext();
                 String packageName = context.getPackageName();
                 Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
                 String className = launchIntent.getComponent().getClassName();
