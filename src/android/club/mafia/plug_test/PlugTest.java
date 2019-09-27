@@ -506,11 +506,11 @@ public class PlugTest extends CordovaPlugin {
                 if (heightDifference > (usableHeightSansKeyboard / 4)) {
                     // keyboard probably just became visible
                     //frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
-                    useCallback(usableHeightSansKeyboard + "");
+                    useCallback(usableHeightNow + "");
                 } else {
                     // keyboard probably just became hidden
                     //frameLayoutParams.height = usableHeightSansKeyboard;
-                    useCallback(usableHeightSansKeyboard + "");
+                    useCallback(usableHeightNow + "");
                 }
                 //mChildOfContent.requestLayout();
                 usableHeightPrevious = usableHeightNow;
