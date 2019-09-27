@@ -1,0 +1,31 @@
+{
+  "name": "plug-test",
+  "version": "1.2.0",
+  "description": "plug for test",
+  "cordova": {
+    "id": "plug-test",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.webiech.ru/shubckin/plug-test.git"
+  },
+  "keywords": [
+    "cordova",
+    "android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Shubckin and QwertyUser",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://gitlab.webiech.ru/shubckin/plug-test.git/issues"
+  },
+  "homepage": "https://gitlab.webiech.ru/shubckin/plug-test.git#readme"
+}
