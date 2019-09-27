@@ -1,4 +1,4 @@
-package club.mafia.plug_test
+package club.mafia.plug_test;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
