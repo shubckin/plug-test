@@ -492,7 +492,16 @@ public class PlugTest extends CordovaPlugin {
             mChildOfContent = content.getChildAt(0);
             mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
-                    possiblyResizeChildOfContent();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    possiblyResizeChildOfContent();
+                                }
+                            },
+                            300);
+
+
                 }
             });
             frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
