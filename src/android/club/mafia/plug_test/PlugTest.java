@@ -106,7 +106,7 @@ public class PlugTest extends CordovaPlugin {
         }
 
         private void inspectDelayed(int delay) {
-            new android.os.Handler().postDelayed(new Runnable() {
+            cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     try {
                         int[] delays = {50, 50, 100, 300, 500};
@@ -119,7 +119,7 @@ public class PlugTest extends CordovaPlugin {
                         useCallbackError(keyboardCallbackContext, e.toString());
                     }
                 }
-            }, delay);
+            });
         }
 
         private void possiblyResizeChildOfContent() throws Exception {
