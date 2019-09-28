@@ -91,6 +91,7 @@ public class PlugTest extends CordovaPlugin {
 
         private View mChildOfContent;
         private int usableHeightPrevious;
+        private boolean isVisiblePrevious = false;
         private FrameLayout.LayoutParams frameLayoutParams;
 
         private KeyboardHandler(Activity activity) {
@@ -123,25 +124,18 @@ public class PlugTest extends CordovaPlugin {
             if (usableHeightNow != usableHeightPrevious) {
                 int totalHeight = mChildOfContent.getRootView().getHeight();
                 int heightDifference = totalHeight - usableHeightNow;
+                boolean isVisible = heightDifference > (totalHeight / 4);
 
-                JSONObject result = new JSONObject();
-                result.put("heightTotal", totalHeight);
-                result.put("heightLeft", usableHeightNow);
-                result.put("heightKeyboard", heightDifference);
-
-
-                if (heightDifference > (totalHeight / 4)) {
-                    // keyboard probably just became visible
-                    //frameLayoutParams.height = usableHeightSansKeyboard - heightDifference;
-                    result.put("isVisible", true);
-                } else {
-                    // keyboard probably just became hidden
-                    //frameLayoutParams.height = usableHeightSansKeyboard;
-                    result.put("isVisible", false);
+                if (isVisiblePrevious != isVisible || isVisible) {
+                    JSONObject result = new JSONObject();
+                    result.put("heightTotal", totalHeight);
+                    result.put("heightLeft", usableHeightNow);
+                    result.put("heightKeyboard", heightDifference);
+                    result.put("isVisible", isVisible);
+                    useCallback(keyboardCallbackContext, result);
                 }
-                //mChildOfContent.requestLayout();
                 usableHeightPrevious = usableHeightNow;
-                useCallback(keyboardCallbackContext, result);
+                isVisiblePrevious = isVisible;
             }
         }
 
