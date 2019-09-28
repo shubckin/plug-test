@@ -99,9 +99,7 @@ public class PlugTest extends CordovaPlugin {
             mChildOfContent = content.getChildAt(0);
             mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
-                    inspectDelayed(100);
-                    inspectDelayed(300);
-                    inspectDelayed(900);
+                    inspectDelayed(5);
                 }
             });
             frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
@@ -111,7 +109,12 @@ public class PlugTest extends CordovaPlugin {
             new android.os.Handler().postDelayed(new Runnable() {
                 public void run() {
                     try {
-                        possiblyResizeChildOfContent();
+                        int[] delays = {50, 50, 100, 300, 500};
+                        for (int i = 0; i < delays.length; i++) {
+                            possiblyResizeChildOfContent();
+                            Thread.sleep(delays[i]);
+                        }
+
                     } catch (Exception e) {
                         useCallbackError(keyboardCallbackContext, e.toString());
                     }
