@@ -99,8 +99,8 @@ public class PlugTest extends CordovaPlugin {
             mChildOfContent = content.getChildAt(0);
             mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
+                    inspectDelayed(100);
                     inspectDelayed(300);
-                    inspectDelayed(600);
                     inspectDelayed(900);
                 }
             });
