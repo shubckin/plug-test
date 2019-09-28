@@ -3,10 +3,9 @@
 
     var PlugTest =
         {
-            testSomething: function (str, callback, onError) {
-                cordova.exec(callback, onError, 'PlugTest', 'testSomething', [str]);
+            setKeyboardCallback: function (callback, onError) {
+                cordova.exec(callback, onError, 'PlugTest', 'setKeyboardCallback');
             },
-
         };
 
     cordova.addConstructor(function () {
